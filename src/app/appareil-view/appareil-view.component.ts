@@ -30,7 +30,7 @@ export class AppareilViewComponent implements OnInit {
   }
 
   onEteindre() {
-    if (confirm('Êtes-vous sûr de vouloir éteindre tous vos appareils ?')) {
+    if(confirm('Etes-vous sûr de vouloir éteindre tous vos appareils ?')) {
       this.appareilService.switchOffAll();
     } else {
       return null;
