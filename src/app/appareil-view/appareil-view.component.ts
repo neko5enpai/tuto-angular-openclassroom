@@ -1,14 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AppareilService } from '../services/appareil.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-appareil-view',
   templateUrl: './appareil-view.component.html',
   styleUrls: ['./appareil-view.component.scss']
 })
-export class AppareilViewComponent implements OnInit {
+export class AppareilViewComponent implements OnInit, OnDestroy {
 
   appareils: any[];
+  appareilSubscription: Subscription;
 
   lastUpdate = new Promise((resolve, reject) => {
     const date = new Date();
@@ -22,7 +24,13 @@ export class AppareilViewComponent implements OnInit {
   constructor(private appareilService: AppareilService) { }
 
   ngOnInit() {
-    this.appareils = this.appareilService.appareils;
+    this.appareilSubscription = this.appareilService.appareilsSubject.subscribe(
+      (appareils: any[]) => {
+        this.appareils = appareils;
+      }
+    );
+    this.appareilService.emitAppareilSubject();
+
   }
 
   onAllumer() {
@@ -30,11 +38,15 @@ export class AppareilViewComponent implements OnInit {
   }
 
   onEteindre() {
-    if(confirm('Etes-vous sûr de vouloir éteindre tous vos appareils ?')) {
+    if (confirm('Etes-vous sûr de vouloir éteindre tous vos appareils ?')) {
       this.appareilService.switchOffAll();
     } else {
       return null;
     }
+  }
+
+  ngOnDestroy() {
+    this.appareilSubscription.unsubscribe();
   }
 
 }
